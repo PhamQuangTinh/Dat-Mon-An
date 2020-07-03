@@ -347,12 +347,42 @@ public class MainActivity extends AppCompatActivity {
                 String slPizza = txtSoLuongPizza.getText().toString();
                 String slHamburger = txtSoLuongHamburger.getText().toString();
                 String slBanhMi = txtSoLuongBanhMi.getText().toString();
-                if(tongTien != "0" && (slPizza != "0" || slBanhMi != "0" || slHamburger != "0")){
+                if(!tongTien.equals("0") && (!slPizza.equals("0") || !slBanhMi.equals("0") || !slHamburger.equals("0"))){
+                    int intTongTien = Integer.parseInt(tongTien);
+                    if(slPizza.equals("0") && (checkCheckBox(cbGap2Phomai,cbGap3Phomai,cbThemPhoMai1)
+                        ||(checkRadioButton(rbDeDay,rbDeMong,rbDeTruyenThong))) == true){
+                        if(cbGap2Phomai.isChecked())
+                            intTongTien -= GIA_GAP_2_PHO_MAI;
+                        if(cbGap3Phomai.isChecked())
+                            intTongTien -= GIA_GAP_3_PHO_MAI;
+                        if(cbThemPhoMai1.isChecked())
+                            intTongTien -= GIA_THEM_PHO_MAI;
+                        if(rbDeTruyenThong.isChecked())
+                            intTongTien -=GIA_DE_TRUYEN_THONG;
+                        if(rbDeDay.isChecked())
+                            intTongTien -=GIA_DE_DAY;
+                        if(rbDeMong.isChecked())
+                            intTongTien -= GIA_DE_MONG;
+                        if(rbVienPhoMai.isChecked())
+                            intTongTien -= GIA_VIEN_PHO_MAI;
+                        if(rbVienXucXich.isChecked())
+                            intTongTien -= GIA_VIEN_XUC_XICH;
+
+                    }
+                    if(slHamburger.equals("0") && checkCheckBox(cbThemPhoMai2,cbThemThitBo,cbThemTrungOpLa) ){
+                        if(cbThemPhoMai2.isChecked())
+                            intTongTien -= GIA_THEM_PHO_MAI_1;
+                        if(cbThemThitBo.isChecked())
+                            intTongTien -= GIA_THEM_THIT_BO;
+                        if(cbThemTrungOpLa.isChecked())
+                            intTongTien -= GIA_THEM_TRUNG_OP_LA;
+                    }
+
                     double giamGia = 0.0;
                     if(maGiamGia.equalsIgnoreCase("abc")){
-                        giamGia = Integer.parseInt(tongTien) * ABC;
+                        giamGia = intTongTien * ABC;
                     }else if(maGiamGia.equalsIgnoreCase("xyz")){
-                        giamGia = Integer.parseInt(tongTien) * XYZ;
+                        giamGia = intTongTien * XYZ;
                     }else{
                         giamGia = 0.0;
                     }
@@ -361,9 +391,14 @@ public class MainActivity extends AppCompatActivity {
                     secondActivate.putExtra("Giam Gia", tongTien);
                     secondActivate.putExtra("Tong Tien", giamGia);
                     startActivity(secondActivate);
-                    String kq = "Giam Gia: " + giamGia + "\nTong Tien: " + tongTien;
+                    txtTongTien.setText(String.valueOf(intTongTien));
+                    String kq = "Giam Gia: " + giamGia +
+                            "\nGia Goc: " + intTongTien +
+                            "\nTong Tien: " + (intTongTien - giamGia);
                     Toast.makeText(getApplicationContext(),
                             kq,Toast.LENGTH_LONG).show();
+
+                    refreshAll();
                 }else{
                     Toast.makeText(getApplicationContext(),"Khong hoan tat duoc",Toast.LENGTH_LONG).show();
                 }
@@ -371,23 +406,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
-
-
         //Nút làm lại
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                refreshEditText(editMaGiamGia);
-                refreshTextView(txtGiamGia,txtTongTien,txtSoLuongBanhMi,txtSoLuongHamburger,txtSoLuongPizza);
-                refreshCheckBox(cbThemPhoMai1,cbGap2Phomai,cbGap3Phomai,cbThemPhoMai2,
-                        cbThemThitBo,cbThemTrungOpLa);
-                refreshRadioButton(rbDeMong,rbDeDay,rbDeTruyenThong);
-                refreshRadioButton(rbVienPhoMai,rbVienXucXich);
-                refreshRadioButton(rbBMOpLa,rbBMPhoMaiThitNguoi,rbBMChaCa);
-
+                refreshAll();
             }
         });
 
@@ -444,6 +467,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void refreshAll(){
+        refreshEditText(editMaGiamGia);
+        refreshTextView(txtGiamGia,txtTongTien,txtSoLuongBanhMi,txtSoLuongHamburger,txtSoLuongPizza);
+        refreshCheckBox(cbThemPhoMai1,cbGap2Phomai,cbGap3Phomai,cbThemPhoMai2,
+                cbThemThitBo,cbThemTrungOpLa);
+        refreshRadioButton(rbDeMong,rbDeDay,rbDeTruyenThong);
+        refreshRadioButton(rbVienPhoMai,rbVienXucXich);
+        refreshRadioButton(rbBMOpLa,rbBMPhoMaiThitNguoi,rbBMChaCa);
+        txtTongTien.setText("0");
+        txtGiamGia.setText("0");
+    }
+
     private void refreshCheckBox(CheckBox... checkBoxes){
         for(CheckBox checkBox : checkBoxes){
             checkBox.setChecked(false);
@@ -466,5 +501,23 @@ public class MainActivity extends AppCompatActivity {
         for(TextView textView : textViews){
             textView.setText("0");
         }
+    }
+
+    private boolean checkCheckBox(CheckBox... checkBoxes){
+        for(CheckBox checkBox : checkBoxes){
+            if(checkBox.isChecked()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkRadioButton(RadioButton... radioButtons){
+        for(RadioButton radioButton: radioButtons){
+            if(radioButton.isChecked()){
+                return true;
+            }
+        }
+        return false;
     }
 }
